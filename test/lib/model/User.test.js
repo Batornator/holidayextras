@@ -340,4 +340,164 @@ describe("User Model", function () {
 
     });
   });
+
+  describe("deleteById", () => {
+    it("should call db.query with the appropriate sql and values", async () => {
+      const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      await proxyQuiredUser.deleteById(1);
+      expect(queryStub).to.have.been.calledOnceWith(
+        "DELETE FROM user WHERE id = ?",
+        [1]
+      );
+    });
+
+    it("should reject with a not found if there are no affected rows", async () => {
+      const queryStub = sinon.stub().yields(null, {affectedRows: 0});
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      try {
+        await proxyQuiredUser.deleteById(1);
+      } catch (e) {
+        expect(e.code).to.equal("REQUESTED_RESOURCE_NOT_FOUND");
+      }
+
+      expect(queryStub).to.have.been.called;
+
+    });
+
+    it("should gracefully handle sql errors", async () => {
+      const queryStub = sinon.stub().yields("ERROR");
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      try {
+        await proxyQuiredUser.deleteById(1);
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+
+      expect(queryStub).to.have.been.called;
+    });
+
+    it("should resolve with an object containing the deleted id", async () => {
+      const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      const result = await proxyQuiredUser.deleteById(1);
+
+      expect(queryStub).to.have.been.called;
+      expect(result).to.eql({ id: 1 });
+
+    });
+  });
+
+  describe("updateById", () => {
+    it("should reject with an error if validation fails", async () => {
+      const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      try {
+        await proxyQuiredUser().updateById(1, {email: "test"});
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+
+      expect(queryStub).to.not.have.been.called;
+
+    });
+
+    it("should call db.query with the appropriate sql and values", async () => {
+      const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      sinon.stub(proxyQuiredUser, "findById");
+      proxyQuiredUser.findById.resolves({});
+
+      await proxyQuiredUser.updateById(1, { email: "test@test.com", givenName: "test1", familyName: "test2" });
+      expect(queryStub).to.have.been.calledOnceWith(
+        "UPDATE user SET ? WHERE id = ?",
+        [ { email: "test@test.com", given_name: "test1", family_name: "test2" }, 1 ]
+      );
+    });
+
+    it("should call findById with the updated ID if successful", async () => {
+      const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      sinon.stub(proxyQuiredUser, "findById");
+      proxyQuiredUser.findById.resolves({});
+
+      await proxyQuiredUser.updateById(1, { email: "test@test.com", givenName: "test1", familyName: "test2" });
+      expect(proxyQuiredUser.findById).to.have.been.calledOnceWith(1);
+
+    });
+
+    it("should gracefully handle update errors", async () => {
+      const queryStub = sinon.stub().yields("ERROR");
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      sinon.stub(proxyQuiredUser, "findById");
+      proxyQuiredUser.findById.resolves({});
+
+      try {
+        await proxyQuiredUser.updateById(1, { email: "test@test.com", givenName: "test1", familyName: "test2" });
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+      expect(proxyQuiredUser.findById).to.not.have.been.called;
+    });
+
+    it("should gracefully handle findById errors", async () => {
+      const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      sinon.stub(proxyQuiredUser, "findById");
+      proxyQuiredUser.findById.rejects("error");
+
+      try {
+        await proxyQuiredUser.updateById(1, { email: "test@test.com", givenName: "test1", familyName: "test2" });
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+      expect(proxyQuiredUser.findById).to.have.been.called;
+
+    });
+  });
 });
