@@ -12,6 +12,33 @@ const User = require("../../../lib/model/User");
 
 describe("User Store", function () {
 
+  describe("getPagingParams", () => {
+    it("should return valid paging params for passed input", () => {
+      const Users = require("../../../lib/store/Users.js");
+
+      const result1 = Users.getPagingParams(1, 20);
+      const result2 = Users.getPagingParams(4, 80);
+      const result3 = Users.getPagingParams(3, 25);
+
+      expect(result1).to.eql({ numberOfResults: 20, offset: 0 })
+      expect(result2).to.eql({ numberOfResults: 80, offset: 240 })
+      expect(result3).to.eql({ numberOfResults: 25, offset: 50 })
+    });
+
+    it ("should use defaults when falsy values are provided", () => {
+
+      const Users = require("../../../lib/store/Users.js");
+
+      const result1 = Users.getPagingParams();
+      const result2 = Users.getPagingParams(null, 80);
+      const result3 = Users.getPagingParams(3, null);
+
+      expect(result1).to.eql({ numberOfResults: 20, offset: 0 })
+      expect(result2).to.eql({ numberOfResults: 80, offset: 0 })
+      expect(result3).to.eql({ numberOfResults: 20, offset: 40 })
+    });
+  });
+
   describe ("mapToModels", () => {
     it ("should call the User Models fromDatabse function for each record", () => {
       const fromDatabaseStub = sinon.stub().returns({email: "test@test.com"});
@@ -129,6 +156,86 @@ describe("User Store", function () {
       sinon.stub(proxyQuiredUsersStore, "mapToModels");
       proxyQuiredUsersStore.mapToModels.returns([{ id: 1 }]);
       const result = await proxyQuiredUsersStore.findAll();
+
+      expect(proxyQuiredUsersStore.mapToModels).to.have.been.calledWith([{email: "test@test.com"}]);
+      expect(result).to.eql([{ id: 1 }]);
+
+    });
+  });
+
+  describe("findByEmail", () => {
+    it("should call db.query with the appropriate sql and values", async () => {
+      const fromDatabaseStub = sinon.stub().returns({email: "test@test.com"});
+      const queryStub = sinon.stub().yields(null, []);
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../model/User": {
+          fromDatabase: fromDatabaseStub
+        },
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      await proxyQuiredUsersStore.findByEmail("test@test.com", 2, 30);
+      expect(queryStub).to.have.been.calledOnceWith(
+        "SELECT * FROM user WHERE email = ? LIMIT ? OFFSET ?",
+        ["test@test.com", 30, 30]
+      );
+    });
+
+    
+    it("should call db.query with the default paging values if none are provided", async () => {
+      const fromDatabaseStub = sinon.stub().returns({email: "test@test.com"});
+      const queryStub = sinon.stub().yields(null, []);
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../model/User": {
+          fromDatabase: fromDatabaseStub
+        },
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      await proxyQuiredUsersStore.findByEmail("test@test.com");
+      expect(queryStub).to.have.been.calledOnceWith(
+        "SELECT * FROM user WHERE email = ? LIMIT ? OFFSET ?",
+        ["test@test.com", 20, 0]
+      );
+    });
+
+    it("should gracefully handle sql errors", async () => {
+      const fromDatabaseStub = sinon.stub().returns({email: "test@test.com"});
+      const queryStub = sinon.stub().yields("ERROR");
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../model/User": {
+          fromDatabase: fromDatabaseStub
+        },
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      try {
+        await proxyQuiredUsersStore.findByEmail("test@test.com");
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+
+      expect(queryStub).to.have.been.called;
+    });
+
+    it("should resolve with a call to mapToModels", async () => {
+      const queryStub = sinon.stub().yields(null, [{email: "test@test.com"}]);
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+
+      sinon.stub(proxyQuiredUsersStore, "mapToModels");
+      proxyQuiredUsersStore.mapToModels.returns([{ id: 1 }]);
+      const result = await proxyQuiredUsersStore.findByEmail("test@test.com");
 
       expect(proxyQuiredUsersStore.mapToModels).to.have.been.calledWith([{email: "test@test.com"}]);
       expect(result).to.eql([{ id: 1 }]);
