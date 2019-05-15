@@ -85,7 +85,7 @@ describe("getById Route", function () {
 
     await proxyQuiredRoute({params: {userId: 1}}, res, callback);
     expect(findByIdStub).to.have.been.calledOnceWith(1);
-    expect(genericErrorStub).to.have.been.calledOnceWith( "Error retrieveing user", { code: "TEST" } );
+    expect(genericErrorStub).to.have.been.calledOnceWith( "Error retrieving user", { code: "TEST" } );
     expect(callback).to.have.been.calledOnceWith("TEST ERROR");
   });
 });
