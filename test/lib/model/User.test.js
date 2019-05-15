@@ -191,11 +191,41 @@ describe("User Model", function () {
 
     });
 
-    it("should call db.query with the appropriate sql and values", async () => {
+    it("should call db.withintransaction", async () => {
       const queryStub = sinon.stub().yields(null, { insertId: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = sinon.stub().resolves({});
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
+        }
+      });
+
+      sinon.stub(proxyQuiredUser, "findById");
+      proxyQuiredUser.findById.resolves({});
+
+      const user = new proxyQuiredUser({ email: "test@test.com", givenName: "test1", familyName: "test2" });
+
+      await user.save();
+      expect(withinTransactionStub).to.have.been.calledOnce;
+    });
+
+    it("should call the transaction query method with correct sql and params", async () => {
+      const queryStub = sinon.stub().yields(null, { insertId: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          withinTransaction: withinTransactionStub
         }
       });
 
@@ -208,15 +238,26 @@ describe("User Model", function () {
       expect(queryStub).to.have.been.calledOnceWith(
         "INSERT INTO user (email, given_name, family_name) VALUES (?, ?, ?)",
         ["test@test.com", "test1", "test2"]
-      );
+      );;
     });
+
     it("should call findById with the inserted ID if successful", async () => {
       const queryStub = sinon.stub().yields(null, { insertId: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
         }
       });
+
 
       sinon.stub(proxyQuiredUser, "findById");
       proxyQuiredUser.findById.resolves({});
@@ -224,15 +265,24 @@ describe("User Model", function () {
       const user = new proxyQuiredUser({ email: "test@test.com", givenName: "test1", familyName: "test2" });
 
       await user.save();
-      expect(proxyQuiredUser.findById).to.have.been.calledOnceWith(1);
+      expect(proxyQuiredUser.findById).to.have.been.calledOnceWith(1, transactionStub);
 
     });
 
     it("should gracefully handle insert errors", async () => {
       const queryStub = sinon.stub().yields("ERROR");
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
         }
       });
 
@@ -251,9 +301,18 @@ describe("User Model", function () {
 
     it("should gracefully handle findById errors", async () => {
       const queryStub = sinon.stub().yields(null, { insertId: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
         }
       });
 
@@ -358,7 +417,7 @@ describe("User Model", function () {
     });
 
     it("should reject with a not found if there are no affected rows", async () => {
-      const queryStub = sinon.stub().yields(null, {affectedRows: 0});
+      const queryStub = sinon.stub().yields(null, { affectedRows: 0 });
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
           query: queryStub
@@ -418,7 +477,7 @@ describe("User Model", function () {
       });
 
       try {
-        await proxyQuiredUser().updateById(1, {email: "test"});
+        await proxyQuiredUser().updateById(1, { email: "test" });
       } catch (e) {
         expect(e).to.not.be.null;
       }
@@ -427,11 +486,39 @@ describe("User Model", function () {
 
     });
 
-    it("should call db.query with the appropriate sql and values", async () => {
+    it("should call db.withintransaction", async () => {
       const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = sinon.stub().resolves({});
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
+        }
+      });
+
+      sinon.stub(proxyQuiredUser, "findById");
+      proxyQuiredUser.findById.resolves({});
+
+      await proxyQuiredUser.updateById(1, { email: "test@test.com", givenName: "test1", familyName: "test2" });
+      expect(withinTransactionStub).to.have.been.calledOnce;
+    });
+
+    it("should call the transaction query method with correct sql and params", async () => {
+      const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
+      const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
+        "../utilities/database/mysql": {
+          withinTransaction: withinTransactionStub
         }
       });
 
@@ -441,15 +528,24 @@ describe("User Model", function () {
       await proxyQuiredUser.updateById(1, { email: "test@test.com", givenName: "test1", familyName: "test2" });
       expect(queryStub).to.have.been.calledOnceWith(
         "UPDATE user SET ? WHERE id = ?",
-        [ { email: "test@test.com", given_name: "test1", family_name: "test2" }, 1 ]
+        [{ email: "test@test.com", given_name: "test1", family_name: "test2" }, 1]
       );
     });
 
     it("should call findById with the updated ID if successful", async () => {
       const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
         }
       });
 
@@ -463,9 +559,18 @@ describe("User Model", function () {
 
     it("should gracefully handle update errors", async () => {
       const queryStub = sinon.stub().yields("ERROR");
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
         }
       });
 
@@ -482,9 +587,18 @@ describe("User Model", function () {
 
     it("should gracefully handle findById errors", async () => {
       const queryStub = sinon.stub().yields(null, { affectedRows: 1 });
+      const transactionStub = {
+        query: queryStub
+      };
+      const withinTransactionStub = (fn) => {
+        return new Promise((resolve) => {
+          fn(transactionStub);
+          resolve({});
+        });
+      };
       const proxyQuiredUser = proxyquire("../../../lib/model/User.js", {
         "../utilities/database/mysql": {
-          query: queryStub
+          withinTransaction: withinTransactionStub
         }
       });
 
