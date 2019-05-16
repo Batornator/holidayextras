@@ -1,0 +1,482 @@
+{
+	"info": {
+		"_postman_id": "f3ebc2ac-12a6-4a89-bd7a-5db27d571804",
+		"name": "Holiday Extras API collection",
+		"description": "A successful and unsuccessful example call to each API route in the Holiday Extras coding test.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST: Create User - Success",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtest@testdomain.com\",\n\t\"givenName\": \"Test\",\n\t\"familyName\": \"McTester\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						""
+					]
+				},
+				"description": "Sucessful POST request to create a new user"
+			},
+			"response": []
+		},
+		{
+			"name": "POST: Create User - Fail",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtesttestdomain.com\",\n\t\"givenName\": \"Test\",\n\t\"familyName\": \"McTester\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						""
+					]
+				},
+				"description": "Create user POST request with a bad email address causing a validation error"
+			},
+			"response": []
+		},
+		{
+			"name": "PUT: Update User - Success",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtest-updated@testdomain.com\",\n\t\"givenName\": \"Test2\",\n\t\"familyName\": \"McTester2\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/1",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"1"
+					]
+				},
+				"description": "Successful PUT request to update a user. Assumes user with ID 1 exists. If not you may need to change the ID in the URL"
+			},
+			"response": []
+		},
+		{
+			"name": "PUT: Update User - Fail",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtest-updatedtestdomain.com\",\n\t\"givenName\": \"Test2\",\n\t\"familyName\": \"McTester2\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/1",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"1"
+					]
+				},
+				"description": "A failing PUT request to update user. Fails on validation. User id in url may need to be changed"
+			},
+			"response": []
+		},
+		{
+			"name": "GET: User - Success",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtest-updated@testdomain.com\",\n\t\"givenName\": \"Test2\",\n\t\"familyName\": \"McTester2\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						""
+					]
+				},
+				"description": "A GET request to fetch all users (default paging - page 1, pageSize 20)"
+			},
+			"response": []
+		},
+		{
+			"name": "GET: User with paging params - Success",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtest-updated@testdomain.com\",\n\t\"givenName\": \"Test2\",\n\t\"familyName\": \"McTester2\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/?page=1&resultsPerPage=1",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "resultsPerPage",
+							"value": "1"
+						}
+					]
+				},
+				"description": "GET for first page containing 1 User"
+			},
+			"response": []
+		},
+		{
+			"name": "GET: User by ID - Success",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtest-updated@testdomain.com\",\n\t\"givenName\": \"Test2\",\n\t\"familyName\": \"McTester2\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/1",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"1"
+					]
+				},
+				"description": "GET request to fetch a single user by id"
+			},
+			"response": []
+		},
+		{
+			"name": "GET: User By ID - Fail",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mrtest-updated@testdomain.com\",\n\t\"givenName\": \"Test2\",\n\t\"familyName\": \"McTester2\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/11111",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"11111"
+					]
+				},
+				"description": "GET a user id that doesn't exist"
+			},
+			"response": []
+		},
+		{
+			"name": "GET: User search by email - Success",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"barrychuckle123@chucklebrothers.com\",\n\t\"givenName\": \"Barry\",\n\t\"familyName\": \"Chuckle\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/search?email=mrtest@testdomain.com",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"search"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "mrtest@testdomain.com"
+						}
+					]
+				},
+				"description": "GETS any users with email mrtest@testdomain.com.\n\nThis should succeed if ran before the update"
+			},
+			"response": []
+		},
+		{
+			"name": "GET: User search by email - no results",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"barrychuckle123@chucklebrothers.com\",\n\t\"givenName\": \"Barry\",\n\t\"familyName\": \"Chuckle\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/search?email=aaaaaa@bbbbb.com",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"search"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "aaaaaa@bbbbb.com"
+						}
+					]
+				},
+				"description": "GET for user search by email. Returns an empty result set as no users with the email exist"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE: User by ID - Success",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"barrychuckle123@chucklebrothers.com\",\n\t\"givenName\": \"Barry\",\n\t\"familyName\": \"Chuckle\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/1",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"1"
+					]
+				},
+				"description": "DELETEs the user with id 1"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE: User by ID - Fail",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "693f948c-ba3f-4f4a-a92b-b60e0f0f98dc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"barrychuckle123@chucklebrothers.com\",\n\t\"givenName\": \"Barry\",\n\t\"familyName\": \"Chuckle\"\n}"
+				},
+				"url": {
+					"raw": "localhost:1337/v1/user/11111",
+					"host": [
+						"localhost"
+					],
+					"port": "1337",
+					"path": [
+						"v1",
+						"user",
+						"11111"
+					]
+				},
+				"description": "Fails with User id does not exist"
+			},
+			"response": []
+		}
+	]
+}
