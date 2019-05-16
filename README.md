@@ -2,8 +2,6 @@
 
 ## Running the API
 
-------
-
 To run the API you first need a `.env` file, a `.env.sample` is provided for convenience. You then have 2 options:
 
 ### Docker
@@ -27,8 +25,6 @@ To run manually you will need a number of things.
 * Finally you can run `npm start` to spin up the API.
 
 ## Testing
-
-------
 
 To test the API a convenience postman collection is provided containing a number of successul and failing requests.
 
