@@ -240,4 +240,113 @@ describe("User Store", function () {
 
     });
   });
+
+  describe("count", () => {
+    it("should call db.query with the appropriate sql", async () => {
+      const queryStub = sinon.stub().yields(null, [{ totalResults: 1 }]);
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      await proxyQuiredUsersStore.count();
+      expect(queryStub).to.have.been.calledOnceWith(
+        "SELECT COUNT(*) AS totalResults FROM user"
+      );
+    });
+
+
+    it("should gracefully handle sql errors", async () => {
+      const queryStub = sinon.stub().yields("ERROR");
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      try {
+        await proxyQuiredUsersStore.count();
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+
+      expect(queryStub).to.have.been.called;
+    });
+
+    it("should error if there is nothing returned from the call to query", async () => {
+      const queryStub = sinon.stub().yields(null, []);
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      try {
+        await proxyQuiredUsersStore.count();
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+
+      expect(queryStub).to.have.been.called;
+
+    });
+  });
+
+  describe("countByEmail", () => {
+    it("should call db.query with the appropriate sql and values", async () => {
+      const queryStub = sinon.stub().yields(null, [{ totalResults: 1 }]);
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+      const email = "test@test.com";
+      await proxyQuiredUsersStore.countByEmail(email);
+      expect(queryStub).to.have.been.calledOnceWith(
+        "SELECT COUNT(*) AS totalResults FROM user WHERE email = ?",
+        [email]
+      );
+    });
+
+
+    it("should gracefully handle sql errors", async () => {
+      const queryStub = sinon.stub().yields("ERROR");
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      const email = "test@test.com";
+
+      try {
+        await proxyQuiredUsersStore.countByEmail(email);
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+
+      expect(queryStub).to.have.been.called;
+    });
+
+    it("should error if there is nothing returned from the call to query", async () => {
+      const queryStub = sinon.stub().yields(null, []);
+      const proxyQuiredUsersStore = proxyquire("../../../lib/store/Users.js", {
+        "../utilities/database/mysql": {
+          query: queryStub
+        }
+      });
+
+      const email = "test@test.com";
+
+      try {
+        await proxyQuiredUsersStore.countByEmail(email);
+      } catch (e) {
+        expect(e).to.not.be.null;
+      }
+
+      expect(queryStub).to.have.been.called;
+
+    });
+  });
 });

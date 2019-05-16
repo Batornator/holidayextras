@@ -8,7 +8,7 @@ const expect = chai.expect;
 chai.should();
 chai.use(sinonChai);
 
-describe("getById Route", function () {
+describe("getByEmail Route", function () {
 
   const getFakeRes = () => {
     const res = {};
@@ -47,9 +47,11 @@ describe("getById Route", function () {
 
   it("should call Users.findByEmailByEmail with email and the correct paging params", async () => {
     const findByEmailStub = sinon.stub().resolves([]);
+    const countByEmailStub = sinon.stub().resolves(1);
     const proxyQuiredRoute = proxyquire("../../../../../../lib/routes/v1/user/search/getByEmail", {
       "../../../../store/Users": {
-        findByEmail: findByEmailStub
+        findByEmail: findByEmailStub,
+        countByEmail: countByEmailStub
       }
     });
 
@@ -62,9 +64,11 @@ describe("getById Route", function () {
 
   it("should call Users.findByEmail with null page number if not in params", async () => {
     const findByEmailStub = sinon.stub().resolves([]);
+    const countByEmailStub = sinon.stub().resolves(1);
     const proxyQuiredRoute = proxyquire("../../../../../../lib/routes/v1/user/search/getByEmail", {
       "../../../../store/Users": {
-        findByEmail: findByEmailStub
+        findByEmail: findByEmailStub,
+        countByEmail: countByEmailStub
       }
     });
 
@@ -77,9 +81,11 @@ describe("getById Route", function () {
 
   it("should call Users.findByEmail with null resultsPerPage if not in params", async () => {
     const findByEmailStub = sinon.stub().resolves([]);
+    const countByEmailStub = sinon.stub().resolves(1);
     const proxyQuiredRoute = proxyquire("../../../../../../lib/routes/v1/user/search/getByEmail", {
       "../../../../store/Users": {
-        findByEmail: findByEmailStub
+        findByEmail: findByEmailStub,
+        countByEmail: countByEmailStub
       }
     });
 
@@ -92,9 +98,11 @@ describe("getById Route", function () {
 
   it("should call Users.findByEmail with null for both paging params if not provided", async () => {
     const findByEmailStub = sinon.stub().resolves([]);
+    const countByEmailStub = sinon.stub().resolves(1);
     const proxyQuiredRoute = proxyquire("../../../../../../lib/routes/v1/user/search/getByEmail", {
       "../../../../store/Users": {
-        findByEmail: findByEmailStub
+        findByEmail: findByEmailStub,
+        countByEmail: countByEmailStub
       }
     });
 
@@ -104,11 +112,29 @@ describe("getById Route", function () {
     expect(findByEmailStub).to.have.been.calledOnceWith("test@test.com", null, null);
   });
 
-  it("should call resolve the request with a http 200 and a successful json payload with data if successful", async () => {
+  it("should call Users.countByEmail once with the correct email", async () => {
     const findByEmailStub = sinon.stub().resolves([]);
+    const countByEmailStub = sinon.stub().resolves(1);
     const proxyQuiredRoute = proxyquire("../../../../../../lib/routes/v1/user/search/getByEmail", {
       "../../../../store/Users": {
-        findByEmail: findByEmailStub
+        findByEmail: findByEmailStub,
+        countByEmail: countByEmailStub
+      }
+    });
+
+    const res = getFakeRes();
+
+    await proxyQuiredRoute({ query: { email: "test@test.com" } }, res, () => { });
+    expect(countByEmailStub).to.have.been.calledOnceWith("test@test.com");
+  });
+
+  it("should call resolve the request with a http 200 and a successful json payload with data if successful", async () => {
+    const findByEmailStub = sinon.stub().resolves([]);
+    const countByEmailStub = sinon.stub().resolves(1);
+    const proxyQuiredRoute = proxyquire("../../../../../../lib/routes/v1/user/search/getByEmail", {
+      "../../../../store/Users": {
+        findByEmail: findByEmailStub,
+        countByEmail: countByEmailStub
       }
     });
 
@@ -116,8 +142,9 @@ describe("getById Route", function () {
 
     await proxyQuiredRoute({ query: { email: "test@test.com" } }, res, () => { });
     expect(findByEmailStub).to.have.been.calledOnceWith("test@test.com", null, null);
+    expect(countByEmailStub).to.have.been.calledOnceWith("test@test.com");
     expect(res.status).to.have.been.calledOnceWithExactly(200);
-    expect(res.json).to.have.been.calledOnceWith({ success: true, users: [] });
+    expect(res.json).to.have.been.calledOnceWith({ success: true, users: [], totalResults: 1 });
   });
 
   it("should wrap errors before handing off to the error handling middleware", async () => {
