@@ -1,6 +1,7 @@
 # Holiday Extras Coding Test - API
 
-## Running the API 
+## Running the API
+
 ------
 
 To run the API you first need a `.env` file, a `.env.sample` is provided for convenience. You then have 2 options:
@@ -24,8 +25,9 @@ To run manually you will need a number of things.
 * Finally you can run `npm start` to spin up the API.
 
 ## Testing
+
 ------
 
 To test the API a convenience postman collection is provided containing a number of successul and failing requests.
 
-There are also a number of unit tests that can be ran using `npm test`.
+There are also a number of unit tests that can be ran using `npm test`. There is no need to have a database running for this.
