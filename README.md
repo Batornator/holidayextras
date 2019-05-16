@@ -12,6 +12,8 @@ To run the API you first need a `.env` file, a `.env.sample` is provided for con
 
 * Docker is the simplest way to run this API. simply `docker-compose build` then `docker-compose up` and the docker container should spin up a MariaDB instance and populate it with the initial schema, followed by the node instance. All installation of dependencies etc. is handled by the building of the images.
 
+* It's worth noting that the first time you start the docker container it will take a while to populate the database and restart. The container will log out`app listening on port 1337` when it is ready.;
+
 ### Manual installation
 
 To run manually you will need a number of things.
